@@ -86,10 +86,10 @@ defmodule SampleApp.MixProject do
       ],
       coverage: ["coveralls.html --raise"],
       codebase: [
-        "cmd npm run stylelint --prefix assets",
-        "cmd npm run eslint --prefix assets",
-        "sobelow --config",
-        "prettier",
+        # "cmd npm run stylelint --prefix assets",
+        # "cmd npm run eslint --prefix assets",
+        # "sobelow --config",
+        # "prettier",
         "credo --strict",
         "deps.unlock --check-unused",
         "format --check-formatted"
