@@ -1,0 +1,111 @@
+name: Build Docker container and deploy app to AWS
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+env:
+  ECR_REPOSITORY: alex-ic
+  REGION: ap-southeast-1
+
+jobs:
+  set_env_variables:
+    name: Set env variables based on current branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set env BRANCH
+        run: echo "BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)" >> $GITHUB_ENV
+
+      - name: Set variables
+        run: |
+          if [[ $BRANCH == 'main' ]]; then
+              echo "CONTAINER_NAME=alex-ic-production" >> "$GITHUB_ENV"
+              echo "ECS_CLUSTER=alex-ic-production-ecs-cluster" >> "$GITHUB_ENV"
+              echo "ECS_SERVICE=alex-ic-production-ecs-service" >> "$GITHUB_ENV"
+              echo "ECS_TASK_DEFINITION=alex-ic-production-service" >> "$GITHUB_ENV"
+          else
+              echo "CONTAINER_NAME=alex-ic-staging" >> "$GITHUB_ENV"
+              echo "ECS_CLUSTER=alex-ic-staging-ecs-cluster" >> "$GITHUB_ENV"
+              echo "ECS_SERVICE=alex-ic-staging-ecs-service" >> "$GITHUB_ENV"
+              echo "ECS_TASK_DEFINITION=alex-ic-staging-service" >> "$GITHUB_ENV"
+          fi
+
+  build_image:
+    needs: set_env_variables
+    name: Build the Docker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+
+    steps:
+      - name: ENV variables
+        uses: FranzDiebold/github-env-vars-action@v2.7.0
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+          mask-aws-account-id: 'no'
+
+      - name: Login to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1.5.3
+
+      - name: Build, tag, and push image to AWS ECR
+        id: build-image
+        env:
+          SHARED_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $SHARED_ECR_REGISTRY/$ECR_REPOSITORY:$CI_REF_NAME_SLUG-$CI_SHA_SHORT -t $SHARED_ECR_REGISTRY/$ECR_REPOSITORY:staging .
+          docker push -a $SHARED_ECR_REGISTRY/$ECR_REPOSITORY
+          echo "::set-output name=image::$SHARED_ECR_REGISTRY/$ECR_REPOSITORY:$CI_REF_NAME_SLUG-$CI_SHA_SHORT"
+  
+  deploy:
+    needs: build_image
+    name: Deploy the built image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1.6.1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+
+      - name: Login to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1.5.3
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} \
+          --query taskDefinition > task-definition.json
+      
+      - name: Fill in the new image ID in the AWS ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.1.3
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ needs.build_image.outputs.image }}
+
+      - name: Trigger ECS Deployment
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1.4.11
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
