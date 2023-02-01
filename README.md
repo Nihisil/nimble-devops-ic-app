@@ -1,8 +1,8 @@
-[![Build Status](CI_BADGE_URL goes here)](REPO_URL goes here)
+[![Run tests and lints](https://github.com/Nihisil/nimble-devops-ic-app/actions/workflows/test.yml/badge.svg)](https://github.com/Nihisil/nimble-devops-ic-app/actions/workflows/test.yml)
 
 ## Introduction
 
-> *App introduction goes here ...*
+Test app to deploy for DevOps IC.
 
 ## Project Setup
 
