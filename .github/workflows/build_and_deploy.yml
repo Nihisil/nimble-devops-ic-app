@@ -3,8 +3,8 @@ name: Build Docker container and deploy app to AWS
 on:
   push:
     branches:
-      # - develop
-      # - main
+      - develop
+      - main
   workflow_dispatch:
 
 env:
