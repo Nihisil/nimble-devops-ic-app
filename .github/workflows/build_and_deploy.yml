@@ -54,16 +54,6 @@ jobs:
       image: ${{ steps.build-image.outputs.image }}
 
     steps:
-      - name: Debug
-        run: |
-          echo "ECR_REPOSITORY=${{ env.ECR_REPOSITORY }}"
-          echo "REGION=${{ env.REGION }}"
-          echo "env_name=${{ needs.shared_variables.outputs.env_name }}"
-          echo "container_name=${{ needs.shared_variables.outputs.container_name }}"
-          echo "ecs_cluster=${{ needs.shared_variables.outputs.ecs_cluster }}"
-          echo "ecs_service=${{ needs.shared_variables.outputs.ecs_service }}"
-          echo "ecs_task_definition=${{ needs.shared_variables.outputs.ecs_task_definition }}"
-      
       - name: ENV variables
         uses: FranzDiebold/github-env-vars-action@v2.7.0
 
