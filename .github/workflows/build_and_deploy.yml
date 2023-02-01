@@ -24,10 +24,10 @@ jobs:
       ecs_task_definition: ${{ steps.populate-outputs.outputs.ecs_task_definition }}
 
     steps:
-      - name: Set env BRANCH
+      - name: Set current branch name to variable
         run: echo "BRANCH=$(echo $GITHUB_REF | cut -d'/' -f 3)" >> $GITHUB_ENV
 
-      - name: Set current env variable
+      - name: Set current env name based on current branch name
         run: |
           if [[ $BRANCH == 'main' ]]; then
               echo "CURRENT_ENV=production" >> "$GITHUB_ENV"
@@ -35,7 +35,7 @@ jobs:
               echo "CURRENT_ENV=staging" >> "$GITHUB_ENV"
           fi
 
-      - name: Populate outputs
+      - name: Populate based on current end and shared between jobs variables
         id: populate-outputs
         run: |
             echo "env_name=${{ env.CURRENT_ENV }}" >> $GITHUB_OUTPUT
@@ -54,7 +54,7 @@ jobs:
       image: ${{ steps.build-image.outputs.image }}
 
     steps:
-      - name: ENV variables
+      - name: Expose useful environment variables
         uses: FranzDiebold/github-env-vars-action@v2.7.0
 
       - name: Checkout
