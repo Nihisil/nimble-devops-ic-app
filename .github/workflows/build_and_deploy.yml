@@ -13,7 +13,7 @@ env:
 
 jobs:
   build_and_deploy:
-    name: Build the Docker image
+    name: Build the Docker image and deploy to AWS
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
