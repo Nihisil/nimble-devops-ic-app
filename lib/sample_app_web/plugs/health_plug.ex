@@ -3,8 +3,8 @@ defmodule SampleAppWeb.HealthPlug do
 
   import Plug.Conn
 
-  # alias Ecto.Adapters.SQL
-  # alias SampleApp.Repo
+  alias Ecto.Adapters.SQL
+  alias SampleApp.Repo
 
   require Logger
 
@@ -44,15 +44,14 @@ defmodule SampleAppWeb.HealthPlug do
   end
 
   defp readiness_check do
-    :ok
-    # case SQL.query(Repo, "SELECT 1") do
-    #   {:ok, _result} ->
-    #     :ok
+    case SQL.query(Repo, "SELECT 1") do
+      {:ok, _result} ->
+        :ok
 
-    #   {:error, exception} ->
-    #     Logger.error(inspect(exception))
+      {:error, exception} ->
+        Logger.error(inspect(exception))
 
-    #     :error
-    # end
+        :error
+    end
   end
 end

@@ -7,8 +7,8 @@
 # General application configuration
 import Config
 
-# config :sample_app,
-# ecto_repos: [SampleApp.Repo]
+config :sample_app,
+  ecto_repos: [SampleApp.Repo]
 
 # Configures the endpoint
 config :sample_app, SampleAppWeb.Endpoint,
