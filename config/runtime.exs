@@ -57,6 +57,11 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :sample_app, SampleApp.RedisCache,
+    conn_opts: [
+      url: System.fetch_env!("REDIS_URL")
+    ]
+
   # ## Configuring the mailer
   #
   # In production you need to configure the mailer to use a different adapter.
