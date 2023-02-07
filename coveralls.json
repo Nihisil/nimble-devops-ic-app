@@ -1,16 +1,15 @@
 {
   "skip_files": [
     "lib/mix",
-    "lib/sample_app_mail.ex",
-    "lib/sample_app_web.ex",
-    "lib/sample_app_web/channels/user_socket.ex",
-    "lib/sample_app_web/controllers/api/fallback_controller.ex",
-    "lib/sample_app_web/endpoint.ex",
-    "lib/sample_app_web/plugs/health_plug.ex",
-    "lib/sample_app_web/telemetry.ex",
-    "lib/sample_app_web/views/error_helpers.ex",
     "lib/sample_app/application.ex",
     "lib/sample_app/release_tasks.ex",
+    "lib/sample_app_web.ex",
+    "lib/sample_app_mail.ex",
+    "lib/sample_app_web/endpoint.ex",
+    "lib/sample_app_web/telemetry.ex",
+    "lib/sample_app_web/channels/user_socket.ex",
+    "lib/sample_app_web/views/error_helpers.ex",
+    "lib/sample_app_web/controllers/api/fallback_controller.ex",
     "test/support"
   ],
   "coverage_options": {
