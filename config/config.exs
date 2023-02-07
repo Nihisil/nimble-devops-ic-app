@@ -60,6 +60,16 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :sample_app, cache_adapter: NebulexRedisAdapter
+
+config :sample_app, SampleApp.RedisCache,
+  gc_interval: :timer.hours(12),
+  max_size: 1_000,
+  allocated_memory: 100_000_000,
+  conn_opts: [
+    url: "redis://127.0.0.1:6379"
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

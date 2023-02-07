@@ -15,9 +15,10 @@ defmodule SampleApp.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: SampleApp.PubSub},
       # Start the Endpoint (http/https)
-      SampleAppWeb.Endpoint
+      SampleAppWeb.Endpoint,
       # Start a worker by calling: SampleApp.Worker.start_link(arg)
       # {SampleApp.Worker, arg}
+      SampleApp.RedisCache
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
