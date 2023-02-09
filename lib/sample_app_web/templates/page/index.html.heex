@@ -1,3 +1,7 @@
 <h1>Hi there!</h1>
 
-<p>Cache value: <%= @value %></p>
+<%= form_for @conn, Routes.page_path(@conn, :create), [method: "post"], fn _ -> %>
+  <p>You can <%= submit(gettext("👍 like")) %> this if you are in the mood to do so.</p>
+<% end %>
+
+<p>Number of likes: <%= @likes_count %></p>

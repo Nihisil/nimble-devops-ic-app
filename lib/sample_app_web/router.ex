@@ -25,6 +25,7 @@ defmodule SampleAppWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    post "/create-like", PageController, :create
   end
 
   # Other scopes may use custom stacks.

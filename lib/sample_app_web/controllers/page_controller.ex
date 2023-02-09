@@ -2,11 +2,17 @@
 defmodule SampleAppWeb.PageController do
   use SampleAppWeb, :controller
 
-  def index(conn, _params) do
-    cache_key = "test"
-    SampleApp.RedisCache.put(cache_key, "some-value")
-    value = SampleApp.RedisCache.get(cache_key)
+  alias SampleApp.Social.Likes
 
-    render(conn, "index.html", %{:value => value})
+  def index(conn, _params) do
+    likes_count = Likes.get_number_of_likes()
+
+    render(conn, "index.html", %{:likes_count => likes_count})
+  end
+
+  def create(conn, _params) do
+    Likes.create_like()
+
+    redirect(conn, to: Routes.page_path(conn, :index))
   end
 end
