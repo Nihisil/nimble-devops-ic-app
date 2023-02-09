@@ -44,14 +44,32 @@ defmodule SampleAppWeb.HealthPlug do
   end
 
   defp readiness_check do
-    case SQL.query(Repo, "SELECT 1") do
-      {:ok, _result} ->
-        :ok
+    sql_ready =
+      case SQL.query(Repo, "SELECT 1") do
+        {:ok, _result} ->
+          true
 
-      {:error, exception} ->
-        Logger.error(inspect(exception))
+        {:error, exception} ->
+          Logger.error(inspect(exception))
 
-        :error
+          false
+      end
+
+    redis_ready =
+      try do
+        SampleApp.RedisCache.get("test")
+
+        true
+      rescue
+        exception ->
+          Logger.error(inspect(exception))
+
+          false
+      end
+
+    case sql_ready && redis_ready do
+      true -> :ok
+      false -> :error
     end
   end
 end
